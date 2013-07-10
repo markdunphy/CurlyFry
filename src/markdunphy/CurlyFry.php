@@ -106,7 +106,47 @@ class CurlyFry {
 
 		$this->setOptions( $options );
 
-		print_r($this->options); die();
+		return $this->execute();
+	}
+
+	/**
+	 * Execute a PUT request
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function put()
+	{
+		// Set up PUT options
+		$options = array(
+			CURLOPT_URL  	   	   => $this->url,
+			CURLOPT_POSTFIELDS 	   => $this->queryString( 'PUT' ),
+			CURLOPT_RETURNTRANSFER => 1,
+			CURLOPT_CUSTOMREQUEST  => 'PUT'
+		);
+
+		$this->setOptions( $options );
+
+		return $this->execute();
+	}
+
+	/**
+	 * Execute a DELETE request
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function delete()
+	{
+		// Set up PUT options
+		$options = array(
+			CURLOPT_URL  	   	   => $this->url,
+			CURLOPT_POSTFIELDS 	   => $this->queryString( 'DELETE' ),
+			CURLOPT_RETURNTRANSFER => 1,
+			CURLOPT_CUSTOMREQUEST  => 'DELETE'
+		);
+
+		$this->setOptions( $options );
 
 		return $this->execute();
 	}
