@@ -27,7 +27,7 @@ class CurlyFry {
 	private $request;
 
 	/**
-	 * A default set of cURL options
+	 * A set of cURL options
 	 *
 	 * @access private
 	 * @var array
@@ -151,6 +151,13 @@ class CurlyFry {
 		return $this->execute();
 	}
 
+	/**
+	 * Execute a cURL request and set up response, details, and error
+	 * information.
+	 *
+	 * @access private
+	 * @return string response
+	 */
 	private function execute()
 	{
 		$ch = $this->handler();  // Retrieve a curl handler with options set.
