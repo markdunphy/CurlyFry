@@ -43,12 +43,26 @@ class CurlyFry {
 	 */
 	private $queue = array();
 
+	/**
+	 * Allowed types
+	 *
+	 * @access private
+	 * @var array
+	 */
+	private $types = array( 'GET', 'PUT', 'POST', 'DELETE' );
+
+	/**
+	 * Default arrays of cURL options
+	 *
+	 * @access private
+	 * @var array
+	 */
 	private $defaults = array(
 
 		'GET' => array(
 			CURLOPT_HTTPGET    	   => 1,
 			CURLOPT_URL 	       => NULL,
-			CURLOPT_RETURNTRANSFER => 1
+			CURLOPT_RETURNTRANSFER => TRUE
 		),
 
 		'POST' => array(
@@ -92,6 +106,27 @@ class CurlyFry {
 		$this->request->error    = NULL;
 	}
 
+	public function __call( $name, $arguments )
+	{
+		$name = strtoupper( $name );
+
+		if ( count( $arguments ) > 0 )
+		{
+			$this->setURL( $arguments[0] );
+			@$this->setData( $arguments[1] );
+		}
+
+
+		if ( in_array( $name, $this->types ) )
+		{
+			$this->prepare( $name );
+
+			return $this->execute();
+		}
+
+		return FALSE;
+	}
+
 	/**
 	 * Provide an option to call the class statically
 	 *
@@ -106,97 +141,36 @@ class CurlyFry {
 	}
 
 	/**
-	 * Queue a new request to be executed in parallel
+	 * Prepare the cURL opts for execution
 	 *
-	 * @param string $url
-	 * @param string $name the property name the response should be set to
-	 * @param string $type the type of request.
+	 * @param string $type type of the request.
 	 */
-	public function queue( $url, $name, $type = 'GET' )
+	private function prepare( $type )
 	{
-		// Build a request object with some information
-		$request 	   = (object) array();
-		$request->url  = $url;
-		$request->type = strtolower( $type );
+		$options = $this->getOptions( strtoupper( $type ) );
 
-		// Add it to the queue
-		$this->queue[ $name ] = $request;
-	}
+		$options[ CURLOPT_URL ] = $this->url;
 
-	/**
-	 * Execute a GET request
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		$options = $this->getOptions( 'GET' );
+		$query = $this->queryString( $type );
 
-		$options[ CURLOPT_URL ]  = $this->url;
-		$options[ CURLOPT_URL ] .= $this->data ? $this->queryString( 'GET' ) : '';
+		switch ( $type)
+		{
+			case 'GET':
+				$options[ CURLOPT_URL ] .= $this->data ? $query : '';
+				break;
+
+			case 'POST':
+				$options[ CURLOPT_POST ] 	   = 1;
+				$options[ CURLOPT_POSTFIELDS ] = $query;
+				break;
+
+			case 'PUT' || 'DELETE':
+				$options[ CURLOPT_POSTFIELDS ]   = $query;
+				$options[ CURLOPT_CUSTOMREQUEST ] = $type;
+				break;
+		}
 
 		$this->setOptions( $options );
-
-		return $this->execute();
-	}
-
-	/**
-	 * Execute a POST request
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function post()
-	{
-		// Set up POST options
-		$options = $this->getOptions( 'POST' );
-
-		$options[ CURLOPT_URL ]  	   = $this->url;
-		$options[ CURLOPT_POST ] 	   = count( $this->data );
-		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'POST' );
-
-		$this->setOptions( $options );
-
-		return $this->execute();
-	}
-
-	/**
-	 * Execute a PUT request
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function put()
-	{
-		// Set up PUT options
-		$options = $this->getOptions( 'PUT' );
-
-		$options[ CURLOPT_URL ]  	   = $this->url;
-		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'PUT' );
-
-		$this->setOptions( $options );
-
-		return $this->execute();
-	}
-
-	/**
-	 * Execute a DELETE request
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function delete()
-	{
-		// Set up PUT options
-		$options = $this->getOptions( 'DELETE' );
-
-		$options[ CURLOPT_URL ] 	   = $this->url;
-		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'DELETE' );
-
-		$this->setOptions( $options );
-
-		return $this->execute();
 	}
 
 	/**
@@ -220,6 +194,26 @@ class CurlyFry {
 	}
 
 	/**
+	 * ** NOT YET IMPLEMENTED **
+	 * Queue a new request to be executed in parallel.
+	 *
+	 * @param string $url
+	 * @param string $name the property name the response should be set to
+	 * @param string $type the type of request.
+	 */
+	public function queue( $url, $name, $type = 'GET' )
+	{
+		// Build a request object with some information
+		$request = (object) array(
+			'url'  => $url,
+			'type' => strtolower( $type )
+		);
+
+		// Add it to the queue
+		$this->queue[ $name ] = $request;
+	}
+
+	/**
 	 * Set custom options
 	 *
 	 * @access public
@@ -233,6 +227,11 @@ class CurlyFry {
 		return $this;
 	}
 
+	/**
+	 * Return a template of default options based on type
+	 *
+	 * @return array
+	 */
 	private function getOptions( $type )
 	{
 		return $this->defaults[ $type ];
@@ -296,7 +295,7 @@ class CurlyFry {
 	 */
 	private function queryString( $type )
 	{
-		$query = http_build_query( $this->data );
+		$query = $this->data ? http_build_query( $this->data ) : '';
 
 		return ( $type == 'GET' ) ? '?' . $query : $query;
 	}
@@ -311,7 +310,7 @@ class CurlyFry {
 	{
 		$ch = curl_init();
 		curl_setopt_array( $ch, $this->options );
-		// d( $this->options );
+
 		return $ch;
 	}
 }
