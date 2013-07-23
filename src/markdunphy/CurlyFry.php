@@ -133,6 +133,7 @@ class CurlyFry {
 	{
 		$options = $this->getOptions( 'GET' );
 
+		$options[ CURLOPT_URL ]  = $this->url;
 		$options[ CURLOPT_URL ] .= $this->data ? $this->queryString( 'GET' ) : '';
 
 		$this->setOptions( $options );
@@ -171,7 +172,7 @@ class CurlyFry {
 		// Set up PUT options
 		$options = $this->getOptions( 'PUT' );
 
-		$options[ CURLOPT_URL ] = $this->url;
+		$options[ CURLOPT_URL ]  	   = $this->url;
 		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'PUT' );
 
 		$this->setOptions( $options );
@@ -310,7 +311,7 @@ class CurlyFry {
 	{
 		$ch = curl_init();
 		curl_setopt_array( $ch, $this->options );
-
+		// d( $this->options );
 		return $ch;
 	}
 }
