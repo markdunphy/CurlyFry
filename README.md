@@ -46,10 +46,10 @@ $response = CurlyFry::create( 'http://www.example.com', $data )->delete();
 
 Or you can be really fancy and not care at all about anything by doing this:
 ```php
-$response = CurlyFry::get( 'http://www.example.com/', $data );
-$response = CurlyFry::put( 'http://www.example.com/', $data );
-$response = CurlyFry::post( 'http://www.example.com/', $data );
-$response = CurlyFry::delete( 'http://www.example.com/', $data );
+$response = CurlyFry::get( 'http://www.example.com', $data );
+$response = CurlyFry::put( 'http://www.example.com', $data );
+$response = CurlyFry::post( 'http://www.example.com', $data );
+$response = CurlyFry::delete( 'http://www.example.com', $data );
 ```
 So you're getting JSON back? That's cool, we'll parse that for you.
 ```php
