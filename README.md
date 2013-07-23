@@ -56,6 +56,16 @@ So you're getting JSON back? That's cool, we'll parse that for you.
 $response = CurlyFry::get( 'http://www.example.com/myjson' );
 print $response->whatever; // HOLY MOTHER OF POSEIDON IT WORKS
 ```
+Things not going as planned?  Debug it! CurlyFry stores the details and errors of the last request you made.
+```php
+$salty    = new CurlyFry( 'http://www.example.com' );
+$response = $salty->get(); // Oh no! The call bombed! Why?!?!?!
+
+// Dump out the debug results
+var_dump( $salty->debug() ); // Basically just curl_getinfo()
+var_dump( $salty->error() ); // Basically just curl_error();
+```
+
 
 ###Currently in the Fryer
 * Parallel requests using curl_multi_exec
