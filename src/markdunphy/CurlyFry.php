@@ -128,6 +128,20 @@ class CurlyFry {
 	}
 
 	/**
+	 * Call stuff statically because why the hell not.
+	 *
+	 * @return mixed
+	 */
+	public static function __callStatic( $name, $arguments )
+	{
+		$arguments[1] = isset( $arguments[1] ) ? $arguments[1] : array();
+
+		$salty = new static( $arguments[0], $arguments[1] );
+
+		return $salty->$name();
+	}
+
+	/**
 	 * Provide an option to call the class statically
 	 *
 	 * @access public
@@ -178,7 +192,7 @@ class CurlyFry {
 	 * information.
 	 *
 	 * @access private
-	 * @return string response
+	 * @return mixed object/array if response is json, string otherwise
 	 */
 	private function execute()
 	{
@@ -190,7 +204,7 @@ class CurlyFry {
 
 		curl_close( $ch );
 
-		return $this->request->response;
+		return ( $parsed = json_decode( $this->request->response ) ) ? $parsed : $this->request->response;
 	}
 
 	/**
