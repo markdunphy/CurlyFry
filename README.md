@@ -36,15 +36,14 @@ $salty = new CurlyFry( 'http://www.example.com', $data );
 $response = $salty->post();
 ```
 
-You're also able to create and send your request in static context with one line.
+You're also able to create and send your request in static context with one line:
 ```php
 $response = CurlyFry::create( 'http://www.example.com', $data )->get();
 $response = CurlyFry::create( 'http://www.example.com', $data )->put();
 $response = CurlyFry::create( 'http://www.example.com', $data )->post();
 $response = CurlyFry::create( 'http://www.example.com', $data )->delete();
 ```
-
-Or you can be really fancy and not care at all about anything by doing this:
+Or you can do this which is a lot like the above code, but shorter:
 ```php
 $response = CurlyFry::get( 'http://www.example.com', $data );
 $response = CurlyFry::put( 'http://www.example.com', $data );
