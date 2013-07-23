@@ -10,7 +10,7 @@ The auto-json-parsing, life awesomizing, crunchy, crispy, salty, MIT-licensed li
 CurlyFry provides an easy way to make RESTful calls with support for GET, POST, PUT, and DELETE methods.
 ```php
 // Instantiate a new CurlyFry instance
-$salty = new CurlyFry( 'http://www.google.com' );
+$salty = new CurlyFry( 'http://www.example.com' );
 
 // Execute a GET request
 $response = $salty->get();
@@ -31,25 +31,25 @@ $data = array(
 	'user_id' => 1234
 );
 
-$salty = new CurlyFry( 'http://www.google.com', $data );
+$salty = new CurlyFry( 'http://www.example.com', $data );
 
 $response = $salty->post();
 ```
 
 You're also able to create and send your request in static context with one line.
 ```php
-$response = CurlyFry::create( 'http://www.google.com', $data )->get();
-$response = CurlyFry::create( 'http://www.google.com', $data )->put();
-$response = CurlyFry::create( 'http://www.google.com', $data )->post();
-$response = CurlyFry::create( 'http://www.google.com', $data )->delete();
+$response = CurlyFry::create( 'http://www.example.com', $data )->get();
+$response = CurlyFry::create( 'http://www.example.com', $data )->put();
+$response = CurlyFry::create( 'http://www.example.com', $data )->post();
+$response = CurlyFry::create( 'http://www.example.com', $data )->delete();
 ```
 
 Or you can be really fancy and not care at all about anything by doing this:
 ```php
-$response = CurlyFry::get( 'http://www.google.com/', $data );
-$response = CurlyFry::put( 'http://www.google.com/', $data );
-$response = CurlyFry::post( 'http://www.google.com/', $data );
-$response = CurlyFry::delete( 'http://www.google.com/', $data );
+$response = CurlyFry::get( 'http://www.example.com/', $data );
+$response = CurlyFry::put( 'http://www.example.com/', $data );
+$response = CurlyFry::post( 'http://www.example.com/', $data );
+$response = CurlyFry::delete( 'http://www.example.com/', $data );
 ```
 So you're getting JSON back? That's cool, we'll parse that for you.
 ```php
