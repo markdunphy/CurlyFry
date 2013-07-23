@@ -9,55 +9,55 @@ The auto-json-parsing, life awesomizing, crunchy, crispy, salty, MIT-licensed li
 
 CurlyFry provides an easy way to make RESTful calls with support for GET, POST, PUT, and DELETE methods.
 ```php
-	// Instantiate a new CurlyFry instance
-	$salty = new CurlyFry( 'http://www.google.com' );
+// Instantiate a new CurlyFry instance
+$salty = new CurlyFry( 'http://www.google.com' );
 
-	// Execute a GET request
-	$response = $salty->get();
+// Execute a GET request
+$response = $salty->get();
 
-	// Execute a POST request
-	$response = $salty->post();
+// Execute a POST request
+$response = $salty->post();
 
-	// Execute a PUT request
-	$response = $salty->put();
+// Execute a PUT request
+$response = $salty->put();
 
-	// Execute a DELETE request
-	$response = $salty->delete();
+// Execute a DELETE request
+$response = $salty->delete();
 ```
 
 Obviously, you would need to send data with your request in many cases. Just pass an associative array in as the second parameter to the constructor.
 ```php
-	$data = array(
-		'user_id' => 1234
-	);
+$data = array(
+	'user_id' => 1234
+);
 
-	$salty = new CurlyFry( 'http://www.google.com', $data );
+$salty = new CurlyFry( 'http://www.google.com', $data );
 
-	$response = $salty->post();
+$response = $salty->post();
 ```
 
 You're also able to create and send your request in static context with one line.
 ```php
-	$response = CurlyFry::create( 'http://www.google.com', $data )->get();
-	$response = CurlyFry::create( 'http://www.google.com', $data )->put();
-	$response = CurlyFry::create( 'http://www.google.com', $data )->post();
-	$response = CurlyFry::create( 'http://www.google.com', $data )->delete();
+$response = CurlyFry::create( 'http://www.google.com', $data )->get();
+$response = CurlyFry::create( 'http://www.google.com', $data )->put();
+$response = CurlyFry::create( 'http://www.google.com', $data )->post();
+$response = CurlyFry::create( 'http://www.google.com', $data )->delete();
 ```
 
 Or you can be really fancy and not care at all about anything by doing this:
 ```php
-	$response = CurlyFry::get( 'http://www.google.com/', $data );
-	$response = CurlyFry::put( 'http://www.google.com/', $data );
-	$response = CurlyFry::post( 'http://www.google.com/', $data );
-	$response = CurlyFry::delete( 'http://www.google.com/', $data );
+$response = CurlyFry::get( 'http://www.google.com/', $data );
+$response = CurlyFry::put( 'http://www.google.com/', $data );
+$response = CurlyFry::post( 'http://www.google.com/', $data );
+$response = CurlyFry::delete( 'http://www.google.com/', $data );
 ```
 So you're getting JSON back? That's cool, we'll parse that for you.
 ```php
-	$response = CurlyFry::get( 'http://www.example.com/myjson' );
-	print $response->whatever; // HOLY MOTHER OF POSEIDON IT WORKS
+$response = CurlyFry::get( 'http://www.example.com/myjson' );
+print $response->whatever; // HOLY MOTHER OF POSEIDON IT WORKS
 ```
 
-##License
+###License
 The MIT License (MIT)
 
 Copyright (c) 2013 Mark Dunphy
