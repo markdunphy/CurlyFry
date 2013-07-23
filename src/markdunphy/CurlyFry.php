@@ -47,29 +47,29 @@ class CurlyFry {
 
 		'GET' => array(
 			CURLOPT_HTTPGET    	   => 1,
-			CURLOPT_URL 	       => $this->url,
+			CURLOPT_URL 	       => NULL,
 			CURLOPT_RETURNTRANSFER => 1
 		),
 
 		'POST' => array(
-			CURLOPT_URL  	   	   => $this->url,
-			CURLOPT_POST 	   	   => count( $this->data ),
-			CURLOPT_POSTFIELDS 	   => $this->queryString( 'POST' ),
+			CURLOPT_URL  	   	   => NULL,
+			CURLOPT_POST 	   	   => NULL,
+			CURLOPT_POSTFIELDS 	   => NULL,
 			CURLOPT_RETURNTRANSFER => 1
 		),
 
 		'PUT' => array(
-			CURLOPT_URL  	   	   => $this->url,
-			CURLOPT_POSTFIELDS 	   => $this->queryString( 'PUT' ),
+			CURLOPT_URL  	   	   => NULL,
+			CURLOPT_POSTFIELDS 	   => NULL,
 			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_CUSTOMREQUEST  => 'PUT'
+			CURLOPT_CUSTOMREQUEST  => NULL
 		),
 
 		'DELETE' => array(
-			CURLOPT_URL  	   	   => $this->url,
-			CURLOPT_POSTFIELDS 	   => $this->queryString( 'DELETE' ),
+			CURLOPT_URL  	   	   => NULL,
+			CURLOPT_POSTFIELDS 	   => NULL,
 			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_CUSTOMREQUEST  => 'DELETE'
+			CURLOPT_CUSTOMREQUEST  => NULL
 		)
 	);
 
@@ -153,7 +153,7 @@ class CurlyFry {
 
 		$options[ CURLOPT_URL ]  	   = $this->url;
 		$options[ CURLOPT_POST ] 	   = count( $this->data );
-		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'POST' ),
+		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'POST' );
 
 		$this->setOptions( $options );
 
@@ -190,8 +190,8 @@ class CurlyFry {
 		// Set up PUT options
 		$options = $this->getOptions( 'DELETE' );
 
-		$options[ CURLOPT_URL ] = $this->url;
-		$options[ CURLOPT_POSTFIELDS ] => $this->queryString( 'DELETE' );
+		$options[ CURLOPT_URL ] 	   = $this->url;
+		$options[ CURLOPT_POSTFIELDS ] = $this->queryString( 'DELETE' );
 
 		$this->setOptions( $options );
 
@@ -230,6 +230,11 @@ class CurlyFry {
 		$this->options = $options;
 
 		return $this;
+	}
+
+	private function getOptions( $type )
+	{
+		return $this->defaults[ $type ];
 	}
 
 	/**
@@ -308,10 +313,4 @@ class CurlyFry {
 
 		return $ch;
 	}
-
-	private function getOptions( $type )
-	{
-
-	}
-
 }
