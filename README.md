@@ -3,9 +3,7 @@ CurlyFry
 
 A deliciously elegant PHP cURL wrapper.
 
-This is currently untested. Literally. Like I haven't tested any of this code formally or informally.  I just wrote it.  If you manage to get a hold of this before I get to test it later today, I implore you to let me know how it goes.
-
-Don't let the tests folder fool you. It is empty.
+Some of this is tested. Some of it is not.  There will be phpunit tests when this project has matured a bit more.
 
 ###Documentation
 
