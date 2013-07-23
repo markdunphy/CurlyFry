@@ -10,7 +10,8 @@ The auto-json-parsing, life awesomizing, crunchy, crispy, salty, MIT-licensed li
 CurlyFry provides an easy way to make RESTful calls with support for GET, POST, PUT, and DELETE methods.
 ```php
 // Instantiate a new CurlyFry instance
-$salty = new CurlyFry( 'http://www.example.com' );
+$salty = new CurlyFry( 'http://www.example.com' ); // Normally
+$salty = CurlyFry::create( 'http://www.example.com' ); // Statically
 
 // Execute a GET request
 $response = $salty->get();
