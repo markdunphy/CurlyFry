@@ -57,6 +57,10 @@ $response = CurlyFry::get( 'http://www.example.com/myjson' );
 print $response->whatever; // HOLY MOTHER OF POSEIDON IT WORKS
 ```
 
+###Currently in the Fryer
+* Parallel requests using curl_multi_exec
+* Other things
+
 ###License
 The MIT License (MIT)
 
