@@ -81,6 +81,14 @@ class CurlyFry {
 		$this->request->error    = NULL;
 	}
 
+	/**
+	 * Dynamically execute an HTTP request
+	 * based on the method name (GET/POST/PUT/DELETE).
+	 * 
+	 * @param string $name method name
+	 * @param array $arguments method arguments
+	 * @return mixed
+	 */
 	public function __call( $name, $arguments )
 	{
 		$name = strtoupper( $name );
