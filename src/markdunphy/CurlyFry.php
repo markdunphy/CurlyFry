@@ -57,35 +57,7 @@ class CurlyFry {
 	 * @access private
 	 * @var array
 	 */
-	private $defaults = array(
-
-		'GET' => array(
-			CURLOPT_HTTPGET    	   => 1,
-			CURLOPT_URL 	       => NULL,
-			CURLOPT_RETURNTRANSFER => TRUE
-		),
-
-		'POST' => array(
-			CURLOPT_URL  	   	   => NULL,
-			CURLOPT_POST 	   	   => NULL,
-			CURLOPT_POSTFIELDS 	   => NULL,
-			CURLOPT_RETURNTRANSFER => 1
-		),
-
-		'PUT' => array(
-			CURLOPT_URL  	   	   => NULL,
-			CURLOPT_POSTFIELDS 	   => NULL,
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_CUSTOMREQUEST  => NULL
-		),
-
-		'DELETE' => array(
-			CURLOPT_URL  	   	   => NULL,
-			CURLOPT_POSTFIELDS 	   => NULL,
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_CUSTOMREQUEST  => NULL
-		)
-	);
+	private $defaults = array();
 
 	/**
 	 * Constructor method
@@ -96,6 +68,9 @@ class CurlyFry {
 	 */
 	public function __construct( $url = NULL, $data = array() )
 	{
+		// Set the default cURL options
+		$this->setDefaultOptions();
+
 		// Use the provided settings to update options and such
 		$this->setURL( $url );
 		$this->setData( $data );
@@ -326,5 +301,41 @@ class CurlyFry {
 		curl_setopt_array( $ch, $this->options );
 
 		return $ch;
+	}
+
+	/**
+	 * Set the default cURL options
+	 */
+	private function setDefaultOptions()
+	{
+		$this->defaults = array(
+
+			'GET' => array(
+				CURLOPT_HTTPGET    	   => 1,
+				CURLOPT_URL 	       => NULL,
+				CURLOPT_RETURNTRANSFER => TRUE
+			),
+
+			'POST' => array(
+				CURLOPT_URL  	   	   => NULL,
+				CURLOPT_POST 	   	   => NULL,
+				CURLOPT_POSTFIELDS 	   => NULL,
+				CURLOPT_RETURNTRANSFER => 1
+			),
+
+			'PUT' => array(
+				CURLOPT_URL  	   	   => NULL,
+				CURLOPT_POSTFIELDS 	   => NULL,
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_CUSTOMREQUEST  => NULL
+			),
+
+			'DELETE' => array(
+				CURLOPT_URL  	   	   => NULL,
+				CURLOPT_POSTFIELDS 	   => NULL,
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_CUSTOMREQUEST  => NULL
+			)
+		);
 	}
 }
