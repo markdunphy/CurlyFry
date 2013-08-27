@@ -76,9 +76,11 @@ class CurlyFry {
 		$this->setData( $data );
 
 		// Set up request object
-		$this->request->response = NULL;
-		$this->request->details  = NULL;
-		$this->request->error    = NULL;
+		$this->request = (object) array(
+			'response' => NULL,
+			'details'  => NULL,
+			'error'    => NULL,
+		);
 	}
 
 	/**
