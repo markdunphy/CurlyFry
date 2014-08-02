@@ -1,4 +1,4 @@
-CurlyFry
+CurlyFry ![Build status](https://travis-ci.org/markdunphy/curly-fry.svg)
 ==========
 
 A deliciously elegant PHP cURL wrapper.
