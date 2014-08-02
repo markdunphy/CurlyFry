@@ -3,12 +3,16 @@ CurlyFry
 
 A deliciously elegant PHP cURL wrapper.
 
+**This isn't really maintained nor is it good. Just use Guzzle unless you only want the super basic functionality this provides.**
+
 The auto-json-parsing, life awesomizing, crunchy, crispy, salty, MIT-licensed library of choice for all your cURL-y needs.
 
 ###Documentation
 
 CurlyFry provides an easy way to make RESTful calls with support for GET, POST, PUT, and DELETE methods.
 ```php
+use \markdunphy\CurlyFry;
+
 // Instantiate a new CurlyFry instance
 $salty = new CurlyFry( 'http://www.example.com' ); // Normally
 $salty = CurlyFry::create( 'http://www.example.com' ); // Statically

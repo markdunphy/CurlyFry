@@ -1,0 +1,19 @@
+{
+  "name": "markdunphy/curly-fry",
+  "description": "A deliciously elegant PHP cURL wrapper.",
+  "require-dev": {
+    "phpunit/phpunit": "~3.7.32"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mark Dunphy",
+      "email": "markdunphy@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "markdunphy\\": "src/markdunphy/"
+    }
+  }
+}

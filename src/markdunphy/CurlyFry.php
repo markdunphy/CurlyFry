@@ -1,335 +1,375 @@
-<?php namespace markdunphy\CurlyFry;
+<?php namespace markdunphy;
 
 class CurlyFry {
 
-	/**
-	 * The URL to access
-	 *
-	 * @var string
-	 */
-	private $url = NULL;
+  /**
+   * The URL to access
+   *
+   * @var string
+   */
+  protected $url;
 
-	/**
-	 * The data to send with the request
-	 *
-	 * @var array Associative array
-	 */
-	private $data = array();
+  /**
+   * The data to send with the request
+   *
+   * @var array Associative array
+   */
+  protected $data = [];
 
-	/**
-	 * The info for the last request that was sent.
-	 *
-	 * @var object Contains properties 'response' and 'details'
-	 */
-	private $request;
+  /**
+   * The info for the last request that was sent.
+   *
+   * @var object Contains properties 'response' and 'details'
+   */
+  protected $request;
 
-	/**
-	 * A set of cURL options
-	 *
-	 * @var array
-	 */
-	private $options = array();
+  /**
+   * A set of cURL options
+   *
+   * @var array
+   */
+  protected $options = [];
 
-	/**
-	 * An array of queue'd curl handlers to be
-	 * executed in parallel
-	 *
-	 * @var array
-	 */
-	private $queue = array();
+  /**
+   * An array of queue'd curl handlers to be
+   * executed in parallel
+   *
+   * @var array
+   */
+  protected $queue = [];
 
-	/**
-	 * Allowed types
-	 *
-	 * @var array
-	 */
-	private $types = array( 'GET', 'PUT', 'POST', 'DELETE' );
+  /**
+   * Allowed types
+   *
+   * @var array
+   */
+  protected $types = [ 'GET', 'PUT', 'POST', 'DELETE' ];
 
-	/**
-	 * Default arrays of cURL options
-	 *
-	 * @var array
-	 */
-	private $defaults = array();
+  /**
+   * Default arrays of cURL options
+   *
+   * @var array
+   */
+  protected $defaults = [];
 
-	/**
-	 * Constructor method
-	 *
-	 * @param string $url The URL to access
-	 * @param array $data Associative array of data to send with the request
-	 */
-	public function __construct( $url = NULL, $data = array() )
-	{
-		// Set the default cURL options
-		$this->setDefaultOptions();
+  /**
+   * Constructor method
+   *
+   * @param string $url The URL to access
+   * @param array $data Associative array of data to send with the request
+   */
+  public function __construct( $url = null, $data = [] ) {
 
-		// Use the provided settings to update options and such
-		$this->setURL( $url );
-		$this->setData( $data );
+    // Set the default cURL options
+    $this->setDefaultOptions();
 
-		// Set up request object
-		$this->request = (object) array(
-			'response' => NULL,
-			'details'  => NULL,
-			'error'    => NULL,
-		);
-	}
+    // Use the provided settings to update options and such
+    $this->setURL( $url );
+    $this->setData( $data );
 
-	/**
-	 * Dynamically execute an HTTP request
-	 * based on the method name (GET/POST/PUT/DELETE).
-	 * 
-	 * @param string $name method name
-	 * @param array $arguments method arguments
-	 * @return mixed
-	 */
-	public function __call( $name, $arguments )
-	{
-		$name = strtoupper( $name );
+    // Set up request object
+    $this->request = (object) [
+        'response' => null,
+        'details'  => null,
+        'error'    => null,
+    ];
 
-		if ( count( $arguments ) > 0 )
-		{
-			$this->setURL( $arguments[0] );
-			@$this->setData( $arguments[1] );
-		}
+  } // __construct
+
+  /**
+   * Dynamically execute an HTTP request
+   * based on the method name (GET/POST/PUT/DELETE).
+   *
+   * @param string $name method name
+   * @param array $arguments method arguments
+   *
+   * @return mixed
+   */
+  public function __call( $name, $arguments ) {
+
+    $name = strtoupper( $name );
+
+    if ( count( $arguments ) > 0 )
+    {
+      $this->setURL( $arguments[0] );
+      @$this->setData( $arguments[1] );
+    }
 
 
-		if ( in_array( $name, $this->types ) )
-		{
-			$this->prepare( $name );
+    if ( in_array( $name, $this->types ) )
+    {
+      $this->prepare( $name );
 
-			return $this->execute();
-		}
+      return $this->execute();
+    }
 
-		return FALSE;
-	}
+    return false;
 
-	/**
-	 * Call stuff statically because why the hell not.
-	 *
-	 * @return mixed
-	 */
-	public static function __callStatic( $name, $arguments )
-	{
-		$arguments[1] = isset( $arguments[1] ) ? $arguments[1] : array();
+  } // __call
 
-		$salty = new static( $arguments[0], $arguments[1] );
+  /**
+   * Call stuff statically because why the hell not.
+   *
+   * @return mixed
+   */
+  public static function __callStatic( $name, $arguments ) {
 
-		return $salty->$name();
-	}
+    $arguments[1] = isset( $arguments[1] ) ? $arguments[1] : [];
 
-	/**
-	 * Provide an option to call the class statically
-	 *
-	 * @param string $url The URL to access
-	 * @param array $data Associative array of data to send with the request
-	 * @return markdunphy\CurlyFries
-	 */
-	public static function create( $url, $data = array() )
-	{
-		return new static( $url, $data );
-	}
+    $salty = new static( $arguments[0], $arguments[1] );
 
-	/**
-	 * Prepare the cURL opts for execution
-	 *
-	 * @param string $type type of the request.
-	 */
-	private function prepare( $type )
-	{
-		$options = $this->getOptions( strtoupper( $type ) );
+    return $salty->$name();
 
-		$options[ CURLOPT_URL ] = $this->url;
+  } // __callStatic
 
-		$query = $this->queryString( $type );
+  /**
+   * Provide an option to call the class statically
+   *
+   * @param string $url The URL to access
+   * @param array $data Associative array of data to send with the request
+   *
+   * @return markdunphy\CurlyFries
+   */
+  public static function create( $url, $data = [] ) {
 
-		switch ( $type)
-		{
-			case 'GET':
-				$options[ CURLOPT_URL ] .= $this->data ? $query : '';
-				break;
+    return new static( $url, $data );
 
-			case 'POST':
-				$options[ CURLOPT_POST ] 	   = 1;
-				$options[ CURLOPT_POSTFIELDS ] = $query;
-				break;
+  } // create
 
-			case 'PUT' || 'DELETE':
-				$options[ CURLOPT_POSTFIELDS ]   = $query;
-				$options[ CURLOPT_CUSTOMREQUEST ] = $type;
-				break;
-		}
+  /**
+   * Set URL class property and update relevant curl options
+   *
+   * @param url $string
+   * @return markdunphy\CurlyFries
+   */
+  public function setURL( $url = null ) {
 
-		$this->setOptions( $options );
-	}
+    $this->url = $url;
 
-	/**
-	 * Execute a cURL request and set up response, details, and error
-	 * information.
-	 *
-	 * @return mixed object/array if response is json, string otherwise
-	 */
-	private function execute()
-	{
-		$ch = $this->handler();  // Retrieve a curl handler with options set.
+    return $this;
 
-		$this->request->response = curl_exec( $ch );
-		$this->request->details  = curl_getinfo( $ch );
-		$this->request->error    = curl_error( $ch );
+  } // setURL
 
-		curl_close( $ch );
+  /**
+   * @return string
+   */
+  public function getUrl() {
 
-		return ( $parsed = json_decode( $this->request->response ) ) ? $parsed : $this->request->response;
-	}
+    return $this->url;
 
-	/**
-	 * ** NOT YET IMPLEMENTED **
-	 * Queue a new request to be executed in parallel.
-	 *
-	 * @param string $url
-	 * @param string $name the property name the response should be set to
-	 * @param string $type the type of request.
-	 */
-	public function queue( $url, $name, $type = 'GET' )
-	{
-		// Build a request object with some information
-		$request = (object) array(
-			'url'  => $url,
-			'type' => strtolower( $type )
-		);
+  } // getUrl
 
-		// Add it to the queue
-		$this->queue[ $name ] = $request;
-	}
+  /**
+   * Set data class property and update relevant curl options
+   *
+   * @param array $data
+   *
+   * @return markdunphy\CurlyFry
+   */
+  public function setData( $data = [] ) {
 
-	/**
-	 * Set custom options
-	 *
-	 * @param array $options
-	 * @return markdunphy\CurlyFries
-	 */
-	private function setOptions( $options = array() )
-	{
-		$this->options = $options;
+    $this->data = $data;
 
-		return $this;
-	}
+    return $this;
 
-	/**
-	 * Return a template of default options based on type
-	 *
-	 * @return array
-	 */
-	private function getOptions( $type )
-	{
-		return $this->defaults[ $type ];
-	}
+  } // setData
 
-	/**
-	 * Set URL class property and update relevant curl options
-	 *
-	 * @param url $string
-	 * @return markdunphy\CurlyFries
-	 */
-	public function setURL( $url = NULL )
-	{
-		$this->url = $url;
+  /**
+   * @return array
+   */
+  public function getData() {
 
-		return $this;
-	}
+    return $this->data;
 
-	/**
-	 * Set data class property and update relevant curl options
-	 *
-	 * @param array $data
-	 * @return markdunphy\CurlyFries
-	 */
-	public function setData( $data = array() )
-	{
-		$this->data = $data;
+  } // getData
 
-		return $this;
-	}
+  /**
+   * Debug method.
+   *
+   * @return array Response from curl_getinfo
+   */
+  public function debug() {
 
-	/**
-	 * Debug method.
-	 *
-	 * @return array Response from curl_getinfo
-	 */
-	public function debug()
-	{
-		return $this->request->details;
-	}
+    return $this->request->details;
 
-	/**
-	 * Getter method for the last error generated by cURL
-	 *
-	 * @return string
-	 */
-	public function error()
-	{
-		return $this->request->error;
-	}
+  } // debug
 
-	/**
-	 * Return a query string
-	 *
-	 * @param string $type type of request (GET, POST, PUT, DELETE)
-	 * @return string
-	 */
-	private function queryString( $type )
-	{
-		$query = $this->data ? http_build_query( $this->data ) : '';
+  /**
+   * Getter method for the last error generated by cURL
+   *
+   * @return string
+   */
+  public function error() {
 
-		return ( $type == 'GET' ) ? '?' . $query : $query;
-	}
+    return $this->request->error;
 
-	/**
-	 * Get a cURL handler resource
-	 *
-	 * @return resource
-	 */
-	private function handler()
-	{
-		$ch = curl_init();
-		curl_setopt_array( $ch, $this->options );
+  } // error
 
-		return $ch;
-	}
+  /**
+   * ** NOT YET IMPLEMENTED **
+   * Queue a new request to be executed in parallel.
+   *
+   * @param string $url
+   * @param string $name the property name the response should be set to
+   * @param string $type the type of request.
+   */
+  public function queue( $url, $name, $type = 'GET' ) {
 
-	/**
-	 * Set the default cURL options
-	 */
-	private function setDefaultOptions()
-	{
-		$this->defaults = array(
+    // Build a request object with some information
+    $request = (object) [
+        'url'  => $url,
+        'type' => strtolower( $type )
+    ];
 
-			'GET' => array(
-				CURLOPT_HTTPGET    	   => 1,
-				CURLOPT_URL 	       => NULL,
-				CURLOPT_RETURNTRANSFER => TRUE
-			),
+    // Add it to the queue
+    $this->queue[ $name ] = $request;
 
-			'POST' => array(
-				CURLOPT_URL  	   	   => NULL,
-				CURLOPT_POST 	   	   => NULL,
-				CURLOPT_POSTFIELDS 	   => NULL,
-				CURLOPT_RETURNTRANSFER => 1
-			),
+  } // queue
 
-			'PUT' => array(
-				CURLOPT_URL  	   	   => NULL,
-				CURLOPT_POSTFIELDS 	   => NULL,
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_CUSTOMREQUEST  => NULL
-			),
+  /**
+   * Prepare the cURL opts for execution
+   *
+   * @param string $type type of the request.
+   */
+  protected function prepare( $type ) {
 
-			'DELETE' => array(
-				CURLOPT_URL  	   	   => NULL,
-				CURLOPT_POSTFIELDS 	   => NULL,
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_CUSTOMREQUEST  => NULL
-			)
-		);
-	}
-}
+    $options = $this->getOptions( strtoupper( $type ) );
+
+    $options[ CURLOPT_URL ] = $this->url;
+
+    $query = $this->queryString( $type );
+
+    switch ( $type ) {
+
+      case 'GET':
+        $options[ CURLOPT_URL ] .= $this->data ? $query : '';
+        break;
+
+      case 'POST':
+        $options[ CURLOPT_POST ]     = 1;
+        $options[ CURLOPT_POSTFIELDS ] = $query;
+        break;
+
+      case 'PUT' || 'DELETE':
+        $options[ CURLOPT_POSTFIELDS ]   = $query;
+        $options[ CURLOPT_CUSTOMREQUEST ] = $type;
+        break;
+
+    } // switch type
+
+    $this->setOptions( $options );
+
+  } // prepare
+
+  /**
+   * Execute a cURL request and set up response, details, and error
+   * information.
+   *
+   * @return mixed object/array if response is json, string otherwise
+   */
+  protected function execute() {
+
+    $ch = $this->handler();  // Retrieve a curl handler with options set.
+
+    $this->request->response = curl_exec( $ch );
+    $this->request->details  = curl_getinfo( $ch );
+    $this->request->error    = curl_error( $ch );
+
+    curl_close( $ch );
+
+    return ( $parsed = json_decode( $this->request->response ) ) ? $parsed : $this->request->response;
+
+  } // execute
+
+  /**
+   * Set custom options
+   *
+   * @param array $options
+   *
+   * @return markdunphy\CurlyFry
+   */
+  protected function setOptions( $options = [] ) {
+
+    $this->options = $options;
+
+    return $this;
+
+  } // setOptions
+
+  /**
+   * Return a template of default options based on type
+   *
+   * @return array
+   */
+  protected function getOptions( $type ) {
+
+    return $this->defaults[ $type ];
+
+  } // getOptions
+
+  /**
+   * Return a query string
+   *
+   * @param string $type type of request (GET, POST, PUT, DELETE)
+   *
+   * @return string
+   */
+  protected function queryString( $type ) {
+
+    $query = $this->data ? http_build_query( $this->data ) : '';
+
+    return ( $type == 'GET' ) ? '?' . $query : $query;
+
+  } // queryString
+
+  /**
+   * Get a cURL handler resource
+   *
+   * @return resource
+   */
+  protected function handler() {
+
+    $ch = curl_init();
+    curl_setopt_array( $ch, $this->options );
+
+    return $ch;
+
+  } // handler
+
+  /**
+   * Set the default cURL options
+   */
+  protected function setDefaultOptions() {
+
+    $this->defaults = [
+        'GET' => [
+            CURLOPT_HTTPGET        => 1,
+            CURLOPT_URL          => null,
+            CURLOPT_RETURNTRANSFER => true
+        ],
+
+        'POST' => [
+            CURLOPT_URL          => null,
+            CURLOPT_POST         => null,
+            CURLOPT_POSTFIELDS     => null,
+            CURLOPT_RETURNTRANSFER => 1
+        ],
+
+        'PUT' => [
+            CURLOPT_URL          => null,
+            CURLOPT_POSTFIELDS     => null,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_CUSTOMREQUEST  => null
+        ],
+
+        'DELETE' => [
+            CURLOPT_URL          => null,
+            CURLOPT_POSTFIELDS     => null,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_CUSTOMREQUEST  => null
+        ]
+    ];
+
+  } // setDefaultOptions
+
+} // CurlyFry
